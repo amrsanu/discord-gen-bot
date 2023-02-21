@@ -1,3 +1,3 @@
-##DISCORD GYM TRAINER BOT
+## DISCORD GYM TRAINER BOT
 
 Discord bot using Pythons
