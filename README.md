@@ -1,4 +1,4 @@
-# DISCORD GYM TRAINER BOT
+# DISCORD GEN BOT
 
 ## Requirements
 
