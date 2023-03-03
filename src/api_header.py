@@ -1,3 +1,5 @@
+"""To save the APIs header format."""
+
 joke_api = {
     "url": "https://dad-jokes.p.rapidapi.com/random/joke",
     "headers": {

@@ -41,7 +41,7 @@ def gpt(query=None):
         result = response["choices"][0]["text"]
         print(f"Query: {query}")
         print(f"Response: {result}")
-    return result
+    return result.strip()
 
 
 def main(query=None):

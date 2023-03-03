@@ -4,7 +4,10 @@
 # Standard libraries.
 import sys
 import os
+import asyncio
 import json
+import pyautogui
+import time
 from datetime import datetime, timezone
 
 # Third-party libraries.
@@ -16,7 +19,7 @@ from discord import FFmpegPCMAudio
 import requests
 
 # Local libraries
-from src.config import command_prefix, ANANT_BOT_KEY, command_logging_file_path
+from src.config import COMMAND_PERFIX, ANANT_BOT_KEY, LOG_PATH, SERVER_ID
 from src import api_header
 from services import chat_gpt
 
@@ -26,12 +29,12 @@ CWD = os.path.dirname(os.path.realpath(__file__))
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
-client = commands.Bot(command_prefix=command_prefix, intents=intents)
+client = commands.Bot(command_prefix=COMMAND_PERFIX, intents=intents)
 
 
 def _logger(command, message=None, author=None):
     called_at = datetime.now(timezone.utc)
-    with open(command_logging_file_path, "a", encoding="utf-8") as logger:
+    with open(LOG_PATH, "a", encoding="utf-8") as logger:
         log = f"{called_at}: !{command}: {message}, By:{author}"
         logger.write(f"{log}\n")
         print(log)
@@ -67,6 +70,10 @@ async def on_member_join(member):
         await channel.send(
             f"Welcome to the server, <@{userid}> !\n  # {quote['content']}"
         )
+        with open(os.path.join(CWD, r"data\gifs\night.gif"), "rb") as file:
+            picture = discord.File(file)
+            await channel.send(file=picture)
+            await asyncio.sleep(5)
 
 
 @client.event
@@ -84,6 +91,10 @@ async def on_member_remove(member):
             f"{username}",
         )
         await channel.send(f"Goodbye <@{userid}> !")
+        with open(os.path.join(CWD, r"data\gifs\deer.gif"), "rb") as file:
+            picture = discord.File(file)
+            await channel.send(file=picture)
+        await asyncio.sleep(5)
 
 
 # ================================================================================
@@ -118,9 +129,40 @@ async def send_hbar(ctx, *args):
 async def gpt(ctx, *args):
     """To invoke chat_gpt and get responce to the queries"""
     _logger("!gpt", " ".join(args), ctx.author.mention)
-    result = chat_gpt.gpt(args)
+    result = chat_gpt.gpt(" ".join(args))
 
     await ctx.send(f">> {result}")
+
+
+@client.command(pass_context=True, brief="Send invite message to a user.")
+async def invite(context, user: discord.Member):
+    """To invite the BOT to the voice server
+
+    Args:
+        context (_type_): Allows to comminicate with your discord server.
+            - Also provdes with the information related to user executing the command.
+    """
+    try:
+        channel = context.message.author.voice.channel
+        if channel:
+            await channel.connect()
+            _user = await client.fetch_user(user.id)
+            server = client.get_guild(SERVER_ID)
+            invite_message = f"Hi {user.name}, come join our server! Here's a invite link: {await server.text_channels[0].create_invite()}"
+            await _user.send(invite_message)
+            with open(os.path.join(CWD, r"data\gifs\view_yellow.gif"), "rb") as file:
+                picture = discord.File(file)
+                await _user.send(file=picture)
+            time.sleep(4)
+
+        else:
+            msg = f"Channel: {channel} does not exist."
+            await context.send(msg)
+    except discord.errors.ClientException as ex:
+        msg = f"Error: {ex}"
+        await context.send(msg)
+    finally:
+        _logger("invite", msg, context.author.mention)
 
 
 @client.command(pass_context=True, brief="Add Bot to the Voice channel.")
@@ -137,6 +179,11 @@ async def join_voice(context):
             channel = context.message.author.voice.channel
             await channel.connect()
             await context.send(msg)
+            with open(os.path.join(CWD, r"data\gifs\welcome-banner.gif"), "rb") as file:
+                picture = discord.File(file)
+                await context.send(file=picture)
+            time.sleep(4)
+
         else:
             msg = "You are not in voice channel. Join the voice channel and then run the command."
             await context.send(msg)
@@ -145,30 +192,6 @@ async def join_voice(context):
         await context.send(msg)
     finally:
         _logger("join_voice", msg, context.author.mention)
-
-
-@client.command(pass_context=True, brief="Add Bot to the Voice channel.")
-async def join(context):
-    """To invite the BOT to the voice server #note: Voice not working
-
-    Args:
-        context (_type_): Allows to comminicate with your discord server.
-            - Also provdes with the information related to user executing the command.
-    """
-    msg = "Joining the Voice channel."
-    try:
-        if context.author.voice:
-            channel = context.message.author.voice.channel
-            voice = await channel.connect()
-            source = FFmpegPCMAudio(r"\data\audio\ting.mp3")
-            voice.play(source)
-
-        else:
-            msg = "You are not in voice channel. Join the voice channel and then run the command."
-    except discord.errors.ClientException as ex:
-        msg = f"Error: {ex}"
-    finally:
-        _logger("join", msg, context.author.mention)
 
 
 @client.command(pass_context=True, brief="Remove the Bot from the Voice channel.")
@@ -196,10 +219,10 @@ async def send_invite(ctx, channel_name: str, user: discord.Member):
     if not voice_channel:
         await ctx.send(f"Voice channel {channel_name} not found.")
         return
-    invite = await voice_channel.create_invite()
+    _invite = await voice_channel.create_invite()
     await user.send(
         f"""You have been invited to join {voice_channel.name}! 
-        Use this invite link to join: {invite.url}"""
+        Use this invite link to join: {_invite.url}"""
     )
     await ctx.send(f"Invite link sent to {user.name}.")
 
