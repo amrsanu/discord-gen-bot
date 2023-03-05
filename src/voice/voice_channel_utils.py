@@ -26,11 +26,15 @@ async def pause(context):
     msg = "Pause the the audio."
     try:
         # To get the voice client
-        voice = discord.utils.get(client.voice_clients, guild=context.guild)
-        if voice.is_playing():
-            voice.pause()
+        if context.author.voice:
+            voice = discord.utils.get(client.voice_clients, guild=context.guild)
+            if voice.is_playing():
+                voice.pause()
+            else:
+                msg = "No audio is playing in Voice channel."
         else:
-            msg = "No audio is playing in Voice channel."
+            msg = "You are not in voice channel. Join the voice channel and then run the command."
+
     except discord.errors.ClientException as ex:
         msg = f"Command error: {ex}"
     finally:
@@ -43,12 +47,15 @@ async def resume(context):
     """To resume the audio."""
     msg = "resume the the audio."
     try:
-        # To get the voice client
-        voice = discord.utils.get(client.voice_clients, guild=context.guild)
-        if voice.is_paused():
-            voice.resume()
+        if context.author.voice:
+            # To get the voice client
+            voice = discord.utils.get(client.voice_clients, guild=context.guild)
+            if voice.is_paused():
+                voice.resume()
+            else:
+                msg = "No audio is playing/paused in Voice channel."
         else:
-            msg = "No audio is playing/paused in Voice channel."
+            msg = "You are not in voice channel. Join the voice channel and then run the command."
     except discord.errors.ClientException as ex:
         msg = f"Command error: {ex}"
     finally:
@@ -61,12 +68,15 @@ async def stop(context):
     """To stop the audio."""
     msg = "Stop the current audio."
     try:
-        # To get the voice client
-        voice = discord.utils.get(client.voice_clients, guild=context.guild)
-        if voice.is_paused() or voice.is_playing():
-            voice.stop()
+        if context.author.voice:
+            # To get the voice client
+            voice = discord.utils.get(client.voice_clients, guild=context.guild)
+            if voice.is_paused() or voice.is_playing():
+                voice.stop()
+            else:
+                msg = "No audio is playing/paused in Voice channel."
         else:
-            msg = "No audio is playing/paused in Voice channel."
+            msg = "You are not in voice channel. Join the voice channel and then run the command."
     except discord.errors.ClientException as ex:
         msg = f"Command error: {ex}"
         await context.send(msg)
@@ -80,24 +90,26 @@ async def play(context, song_number: int):
     """To pause the audio."""
     msg = f"Play the song num: {song_number}"
     try:
-        print(type(context))
+        if context.author.voice:
+            if len(AUDIO) > song_number:
+                msg = f"Playing song num{song_number}: {AUDIO[song_number].split(os.path.sep)[-1]}"
 
-        if len(AUDIO) > song_number:
-            msg = f"Playing song num{song_number}: {AUDIO[song_number].split(os.path.sep)[-1]}"
-
-            voice_state = context.guild.voice_client
-            if not voice_state:
-                await context.message.author.voice.channel.connect()
                 voice_state = context.guild.voice_client
+                if not voice_state:
+                    await context.message.author.voice.channel.connect()
+                    voice_state = context.guild.voice_client
 
-            voice = voice_state
-            source = FFmpegPCMAudio(AUDIO[song_number])
-            player = voice.play(
-                source,
-                after=lambda x=None: check_queue(context, context.message.guild.id),
-            )
+                voice = voice_state
+                source = FFmpegPCMAudio(AUDIO[song_number])
+                player = voice.play(
+                    source,
+                    after=lambda x=None: check_queue(context, context.message.guild.id),
+                )
+            else:
+                msg = f"Error: song num: {song_number} not found."
         else:
-            msg = f"Error: song num: {song_number} not found."
+            msg = "You are not in voice channel. Join the voice channel and then run the command."
+
     except discord.errors.ClientException as ex:
         msg = f"Command error: {ex}"
     finally:
@@ -110,19 +122,21 @@ async def queue(context, song_number: int):
     """To queue the songs."""
     msg = f"Queuing the song num{song_number}"
     try:
+        if context.author.voice:
 
-        if len(AUDIO) > song_number:
-            msg = f"Queuing song num{song_number}: {AUDIO[song_number].split(os.path.sep)[-1]}"
-            source = FFmpegPCMAudio(AUDIO[song_number])
-            guild_id = context.message.guild.id
+            if len(AUDIO) > song_number:
+                msg = f"Queuing song num{song_number}: {AUDIO[song_number].split(os.path.sep)[-1]}"
+                source = FFmpegPCMAudio(AUDIO[song_number])
+                guild_id = context.message.guild.id
 
-            if guild_id in song_queues:
-                song_queues[guild_id].append(source)
-            else:
-                song_queues[guild_id] = [
-                    source,
-                ]
-
+                if guild_id in song_queues:
+                    song_queues[guild_id].append(source)
+                else:
+                    song_queues[guild_id] = [
+                        source,
+                    ]
+        else:
+            msg = "You are not in voice channel. Join the voice channel and then run the command."
     except discord.errors.ClientException as ex:
         msg = f"Command error: {ex}"
     finally:

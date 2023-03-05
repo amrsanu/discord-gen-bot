@@ -9,7 +9,7 @@ from discord import FFmpegPCMAudio
 
 from src.discord_main import client
 from src.discord_main import _logger
-from src.config import PROJECT_DIR
+from src.config import PROJECT_DIR, COMMAND_PERFIX
 from data.bad_words import BAD_WORDS, BAD_WORDS_WITH_SPACE
 
 
@@ -57,6 +57,9 @@ async def on_message(message):
     >"""
     try:
         msg = f"{message.content}"
+
+        if message.content.startswith(COMMAND_PERFIX):
+            await client.process_commands(message)
         if message.author.bot:
             return
 

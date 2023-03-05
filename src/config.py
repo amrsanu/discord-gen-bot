@@ -17,9 +17,11 @@ INVITE_LINK = r"https://discord.gg/EJyCvjcm"
 SERVER_ID = 1076579343301607434
 
 
+
 AUDIO = [
-    r"data\audio\Aathma-Raama(PagalWorld).mp3",
+    r"data\audio\Aathma-Raama.mp3",
     r"data\audio\hello, the bot is joining.mp3",
     r"data\audio\ting.mp3",
 ]
 
+RAPID_API_KEY = os.environ["X-RapidAPI-Key"]
