@@ -10,8 +10,15 @@
   - Invite users to Voice channel: $send_invite <mention_user>
   - Invite the BOT to the Voice channel $invite_voice
   - Remove the BOT from the Voice channel $leave_voice
+  - Play Music, $play <song_num>
+  - Pause Music, $pause
+  - Resume Music, $resume 
+  - Stop Music, $stop
+  - Queue Music, $queue <song_num>
 - Events
   - When user joins/leaves the channel - BOT greets with a message and banner.
+  - On message from user
+    - Bot will check for ABUSIVE/SEWEAR/BAD words, warns the user by deleting the message.
 
 ## Requirements
 
