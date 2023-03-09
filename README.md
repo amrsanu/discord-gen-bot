@@ -3,18 +3,23 @@
 ## Features
 
 - Commands to invoke multiple APIs
-  - Query chatgpt using $gpt [query]
-  - Get daily quotes using $quote
-  - Get daily jokes using $joke
+  - Query chatgpt, $gpt [query]
+  - Get daily quotes, $quote
+  - Get daily jokes, $joke
 - Other commands
-  - Invite users to Voice channel: $send_invite <mention_user>
-  - Invite the BOT to the Voice channel $invite_voice
-  - Remove the BOT from the Voice channel $leave_voice
+  - Invite users to Voice channel, $send_invite <mention_user>
+  - Invite the BOT to the Voice channel, $invite_voice
+  - Remove the BOT from the Voice channel, $leave_voice
   - Play Music, $play <song_num>
   - Pause Music, $pause
   - Resume Music, $resume 
   - Stop Music, $stop
   - Queue Music, $queue <song_num>
+  - Send direct message to server users, $message <mention user> [message]
+  - Add personalized embeds in the chat, $embed
+- Managing the users in cannel.
+  - Kick users,
+  - Ban users, 
 - Events
   - When user joins/leaves the channel - BOT greets with a message and banner.
   - On message from user
@@ -28,7 +33,6 @@
   - openai
   - services
   - requests
-  -
 
 ## Setting up the Discord Developer Application
 

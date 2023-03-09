@@ -1,6 +1,5 @@
 """Managing the users in the server"""
 
-
 # Third-party libraries.
 import discord
 from discord.ext import commands
@@ -8,6 +7,14 @@ from discord.ext.commands import has_permissions, MissingPermissions
 
 from src.discord_main import client
 from src.discord_main import _logger
+
+
+@client.command(pass_context=True, brief="Invite link for the channel.")
+async def invite_link(context):
+    """To get a invite link to the channel."""
+    channel = context.channel
+    invite = await channel.create_invite()
+    await context.send(f"Here's the invite link for this channel: {invite.url}")
 
 
 @client.command(pass_context=True, brief="To kick the member.")
@@ -20,7 +27,7 @@ async def kick(context, member: discord.Member, *, reason=None):
         member (discord.member): Mentiopned usert to be kicked
         reason (Str, optional): Reason why to kick. Defaults to None.
     """
-    msg = f"User {member} has been kicked"
+    msg = f"User {member.mention} has been kicked"
     print("-------------------------------------------")
     try:
         await member.kick(reason=reason)
@@ -37,7 +44,7 @@ async def kick_error(context, error):
     if isinstance(error, commands.MissingPermissions):
         msg = "You dont have the permissions to kick people!"
         await context.send(msg)
-        _logger("kick", msg, context.author.mention)
+        _logger("kick_error", msg, context.author.mention)
 
 
 @client.command(pass_context=True, brief="To ban the member.")
@@ -50,7 +57,7 @@ async def ban(context, member: discord.Member, *, reason=None):
         member (discord.member): Mentiopned usert to be baned
         reason (Str, optional): Reason why to ban. Defaults to None.
     """
-    msg = f"User {member} has been baned"
+    msg = f"User {member.mention} has been baned"
     try:
         await member.ban(reason=reason)
         await context.send(msg)
@@ -62,6 +69,7 @@ async def ban(context, member: discord.Member, *, reason=None):
 
 @ban.error
 async def ban_error(context, error):
+    """Handling the permission error for the ban command."""
     if isinstance(error, MissingPermissions):
         msg = "You dont have the permissions to ban people!"
         await context.send(msg)

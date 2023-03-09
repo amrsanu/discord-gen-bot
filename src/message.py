@@ -57,12 +57,10 @@ async def on_message(message):
     >"""
     try:
         msg = f"{message.content}"
-
         if message.content.startswith(COMMAND_PERFIX):
             await client.process_commands(message)
         if message.author.bot:
             return
-
         user = message.author.mention
         if is_bad_swear_in_message(message.content, user):
             await message.delete()
@@ -75,3 +73,12 @@ async def on_message(message):
         await message.channel.send(msg)
     finally:
         _logger("on_message", msg, message.author.mention)
+
+
+@client.command(pass_context=True, brief="To send a message dorectly to user from bot")
+async def message(context, user: discord.Member, *, msg=None):
+    """To send a message dorectly to user from bot"""
+    if msg == None:
+        msg = "Hello there! This is a direct message from bot."
+    embed = discord.Embed(title=msg)
+    await user.send(embed=embed)

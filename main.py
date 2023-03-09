@@ -2,10 +2,12 @@
 """
 
 import sys
+import os
+
 from src.discord_main import client
 from src.config import ANANT_BOT_KEY
 from src.voice import voice_channel, voice_channel_utils
-from src import message, members
+from src import message, members, embeds
 
 
 def main() -> int:

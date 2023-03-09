@@ -7,7 +7,7 @@ from discord import FFmpegPCMAudio
 
 from src.discord_main import client
 from src.discord_main import _logger
-from src.config import AUDIO
+from data.audio.audio_list import AUDIO
 
 song_queues = {}
 

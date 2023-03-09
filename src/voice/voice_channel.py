@@ -9,39 +9,7 @@ from discord import FFmpegPCMAudio
 from src.discord_main import client
 from src.discord_main import _logger
 from src.config import SERVER_ID, PROJECT_DIR
-
-
-@client.command(pass_context=True, brief="Send invite message to a user.")
-async def invite(context, user: discord.Member):
-    """To invite the BOT to the voice server
-
-    Args:
-        context (_type_): Allows to comminicate with your discord server.
-            - Also provdes with the information related to user executing the command.
-    """
-    try:
-        channel = context.message.author.voice.channel
-        if channel:
-            await channel.connect()
-            _user = await client.fetch_user(user.id)
-            server = client.get_guild(SERVER_ID)
-            invite_message = f"Hi {user.name}, come join our server! Here's a invite link: {await server.text_channels[0].create_invite()}"
-            await _user.send(invite_message)
-            with open(
-                os.path.join(PROJECT_DIR, r"data\gifs\view_yellow.gif"), "rb"
-            ) as file:
-                picture = discord.File(file)
-                await _user.send(file=picture)
-            time.sleep(4)
-
-        else:
-            msg = f"Channel: {channel} does not exist."
-            await context.send(msg)
-    except discord.errors.ClientException as ex:
-        msg = f"Error: {ex}"
-        await context.send(msg)
-    finally:
-        _logger("invite", msg, context.author.mention)
+from src.voice import voice_channel_utils
 
 
 @client.command(brief="Invite user to specific Voice channel.")

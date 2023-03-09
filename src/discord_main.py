@@ -19,8 +19,8 @@ import requests
 
 # Local libraries
 from src.config import COMMAND_PERFIX, ANANT_BOT_KEY, LOG_PATH, PROJECT_DIR
-from src import api_header
 from services import chat_gpt
+from src import api_header
 
 
 intents = discord.Intents.default()
@@ -42,6 +42,14 @@ def _logger(command, message=None, author=None):
 async def on_ready():
     """Event triggers when the discord server gets clean start."""
     print("===========================================")
+    # To set the status of the bot, default: Online
+    await client.change_presence(
+        status=discord.Status.idle,
+        # activity=discord.Game("Eagle EYE (o)",
+        activity=discord.Activity(
+            type=discord.ActivityType.watching, name="Keeping an EYE"
+        ),
+    )
     print("Getting the Bot ready for use!")
 
 
@@ -129,12 +137,3 @@ async def gpt(ctx, *args):
     result = chat_gpt.gpt(" ".join(args))
 
     await ctx.send(f">> {result}")
-
-
-def main() -> int:
-    """To run the BOT"""
-    client.run(ANANT_BOT_KEY)
-
-
-if __name__ == "__main__":
-    sys.exit(main())
